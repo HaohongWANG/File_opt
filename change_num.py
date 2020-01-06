@@ -15,9 +15,10 @@ import numpy as np
 5. 通过modify标志控制是否删除json文件中的错误预测结果。
 
 更新日志：
-2020-01-06更新：
+2020-01-06修改：
 * 改为合并至pig_video_test_change内，由主函数调用本文件
 * 改为读入build.json文件而非全部json文件
++ 在输出json文件中添加未被识别的猪栏编号
 + 增加调取表格文件中不同日期信息的功能
 - 去除调用华芯接口的部分
 
@@ -84,13 +85,15 @@ def change_num(test_video_folder,date="1008-1016",modify=True):
             for k in fp:
                 if int(face_list[i]['id']) == k:
                     del(face_list[i])
-            
-            #print(data)
+        
+        dic = {"id":"noidentified","success":fence.tolist()}
+        face_list.append(dic)
+        print(face_list)
         with open(write_json_file,'w') as file_out:
-            json.dump(data,file_out)
+            json.dump(face_list,file_out)
             #print("写入成功！")
             file_out.close()
       
 test_video_folder = "./train1"
     
-change_num(test_video_folder,date="1008-1016",modify=False)    
+change_num(test_video_folder,date="1008-1016",modify=True)    
