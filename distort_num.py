@@ -9,10 +9,22 @@ import numpy as np
 #import pig_video_test_change
 
 """
+方法说明：
+1. 读入同目录下记录猪脸编号的xlsx文件；
+2. 读入$json_dir$目录下的预测结果json文件；
+3. 在控制台输出预测结果与真实结果间的差别；
+4. 通过modify标志控制是否删除json文件中的错误预测结果。
+
+更新日志：
+2020-01-06更新：
+* 改为合并至pig_video_test_change内，由主函数调用本文件
+
+
+2019-12-31创建：
 本文件用于调用华芯提供的接口，读入其生成的json文件，返回未识别信息，并根据正确的猪脸编号，记录未被识别的栏杆位置
 """
 
-def distort_num(json_dir,predict=False):
+def distort_num(json_dir,predict=False,modify=True):
     # 1.读入xlsx文件
     wb = load_workbook("pig_number_v1127.xlsx")
     sheet = wb.active
@@ -29,8 +41,8 @@ def distort_num(json_dir,predict=False):
     #print(len(pig_num_truth))  #测试用代码
     
     # 2.调用华芯接口，生成对应json文件
-    if predict == True:
-        pig_video_test_change.dealwithvideo()  #此处需要写新接口
+    #if predict == True:
+    #    pig_video_test_change.dealwithvideo()  #此处需要写新接口
     
     # 3.读入json文件
     pig_found = []  #用于保存json文件中已被识别到的猪的编号
@@ -64,26 +76,27 @@ def distort_num(json_dir,predict=False):
     #print(type(fp[0]))
     
     # 5.把错误识别的猪从json文件中删除
-    for json_file in json_list:
-        read_json_file = json_dir + json_file
-        write_json_file = json_dir + "new_{}".format(json_file[8:])
-        
-        with open(read_json_file, 'r') as file_in:
-            data = json.load(file_in)
-            file_in.close()
-        face_list = data['pig_face']
-        
-        for i in range(len(face_list)-1,-1,-1):
-            for k in fp:
-                if int(face_list[i]['id']) == k:
-                    del(face_list[i])
-        
-        #print(data)
-        with open(write_json_file,'w') as file_out:
-            json.dump(data,file_out)
-            #print("写入成功！")
-            file_out.close()
+    if modify == 1:
+        for json_file in json_list:
+            read_json_file = json_dir + json_file
+            write_json_file = json_dir + "new_{}".format(json_file[8:])
+            
+            with open(read_json_file, 'r') as file_in:
+                data = json.load(file_in)
+                file_in.close()
+            face_list = data['pig_face']
+            
+            for i in range(len(face_list)-1,-1,-1):
+                for k in fp:
+                    if int(face_list[i]['id']) == k:
+                        del(face_list[i])
+            
+            #print(data)
+            with open(write_json_file,'w') as file_out:
+                json.dump(data,file_out)
+                #print("写入成功！")
+                file_out.close()
         
 json_dir = "F:/File_opt/test_video_1112/"
     
-distort_num(json_dir)    
+#distort_num(json_dir,predict=False,modify=True)    
