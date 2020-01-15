@@ -72,7 +72,7 @@ def change_num(test_video_folder,date="1008-1016",modify=True):
     
     #print(type(fp[0]))
     
-    # 4.把错误识别的猪从json文件中删除
+    # 4.把未识别的猪写入新json文件中
     if modify == True:
         read_json_file = test_video_folder + "/build.json"
         write_json_file = test_video_folder + "/new_build.json"
